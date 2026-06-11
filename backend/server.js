@@ -1,0 +1,203 @@
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import supabase from "./supabase.js";
+
+dotenv.config();
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+app.get("/", (req, res) => {
+  res.send("Queue Cure API Running");
+});
+
+// Add Patient
+app.post("/patients", async (req, res) => {
+  try {
+    const { name, phone } = req.body;
+
+    if (!name || !phone) {
+      return res.status(400).json({
+        success: false,
+        message: "Name and phone are required",
+      });
+    }
+
+    // Get last token
+    const { data: lastPatient } = await supabase
+      .from("patients")
+      .select("token_number")
+      .order("token_number", { ascending: false })
+      .limit(1);
+
+    const nextToken =
+      lastPatient && lastPatient.length > 0
+        ? lastPatient[0].token_number + 1
+        : 101;
+
+    // Insert patient
+    const { data, error } = await supabase
+      .from("patients")
+      .insert([
+        {
+          name,
+          phone,
+          token_number: nextToken,
+        },
+      ])
+      .select();
+
+    if (error) throw error;
+
+    res.status(201).json({
+      success: true,
+      token: nextToken,
+      patient: data[0],
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+app.get("/patients", async (req, res) => {
+  const { data, error } = await supabase
+    .from("patients")
+    .select("*");
+
+  if (error) {
+    return res.status(500).json(error);
+  }
+
+  res.json(data);
+});
+
+app.get("/queue", async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("patients")
+      .select("*")
+      .eq("status", "waiting")
+      .order("token_number");
+
+    if (error) throw error;
+
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+});
+
+app.post("/call-next", async (req, res) => {
+  try {
+    // Get first waiting patient
+    const { data: patients, error } = await supabase
+      .from("patients")
+      .select("*")
+      .eq("status", "waiting")
+      .order("token_number")
+      .limit(1);
+
+    if (error) throw error;
+
+    if (!patients || patients.length === 0) {
+      return res.json({
+        success: false,
+        message: "No patients waiting",
+      });
+    }
+
+    const patient = patients[0];
+
+    // Update patient status
+    const { error: updateError } = await supabase
+      .from("patients")
+      .update({
+        status: "in_consultation",
+      })
+      .eq("id", patient.id);
+
+    if (updateError) throw updateError;
+
+    // Update current token
+    const { data: settings } = await supabase
+  .from("queue_settings")
+  .select("id")
+  .single();
+
+await supabase
+  .from("queue_settings")
+  .update({
+    current_token: patient.token_number,
+  })
+  .eq("id", settings.id);
+
+    res.json({
+      success: true,
+      token: patient.token_number,
+      patient,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+});
+
+app.get("/current-token", async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("queue_settings")
+      .select("*")
+      .single();
+
+    if (error) throw error;
+
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+});
+app.put("/average-time", async (req, res) => {
+  try {
+    const { minutes } = req.body;
+
+    const { error } = await supabase
+      .from("queue_settings")
+      .update({
+        average_consultation_time: minutes,
+      });
+
+    if (error) throw error;
+
+    res.json({
+      success: true,
+      averageTime: minutes,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+app.get("/test-route", (req, res) => {
+  res.send("NEW SERVER VERSION");
+});
+
+
+app.listen(5000, () => {
+  console.log("Server Running");
+});
