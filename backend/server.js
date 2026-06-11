@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import supabase from "./supabase.js";
 
+
 dotenv.config();
 
 const app = express();
@@ -52,6 +53,8 @@ app.post("/patients", async (req, res) => {
 
     if (error) throw error;
 
+    io.emit("queueUpdated");
+
     res.status(201).json({
       success: true,
       token: nextToken,
@@ -73,6 +76,7 @@ app.get("/patients", async (req, res) => {
     .select("*");
 
   if (error) {
+    
     return res.status(500).json(error);
   }
 
@@ -110,6 +114,7 @@ app.post("/call-next", async (req, res) => {
     if (error) throw error;
 
     if (!patients || patients.length === 0) {
+
       return res.json({
         success: false,
         message: "No patients waiting",
@@ -140,6 +145,8 @@ await supabase
     current_token: patient.token_number,
   })
   .eq("id", settings.id);
+
+  io.emit("queueUpdated");
 
     res.json({
       success: true,
@@ -181,6 +188,8 @@ app.put("/average-time", async (req, res) => {
 
     if (error) throw error;
 
+    io.emit("queueUpdated");
+
     res.json({
       success: true,
       averageTime: minutes,
@@ -197,7 +206,17 @@ app.get("/test-route", (req, res) => {
   res.send("NEW SERVER VERSION");
 });
 
+import http from "http";
+import { Server } from "socket.io";
 
-app.listen(5000, () => {
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+  },
+});
+
+server.listen(5000, () => {
   console.log("Server Running");
 });

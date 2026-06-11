@@ -2,6 +2,7 @@
 
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { io } from "socket.io-client";
 
 export default function DisplayPage() {
   const [currentToken, setCurrentToken] =
@@ -48,17 +49,20 @@ const fetchSettings = async () => {
   }
 };
 
-useEffect(() => { 
-
-fetchSettings();
-fetchQueue();
-
-const interval = setInterval(() => {
+useEffect(() => {
   fetchSettings();
   fetchQueue();
-}, 3000);
 
-  return () => clearInterval(interval);
+  const socket = io("http://localhost:5000");
+
+  socket.on("queueUpdated", () => {
+    fetchSettings();
+    fetchQueue();
+  });
+
+  return () => {
+    socket.disconnect();
+  };
 }, []);
 
   return (

@@ -3,6 +3,7 @@
 
 import axios from "axios";
 import { useState, useEffect } from "react";
+import { io } from "socket.io-client";
 
 export default function Home() {
   const [name, setName] = useState("");
@@ -33,12 +34,16 @@ const [queue, setQueue] = useState<Patient[]>([]);
   fetchQueue();
   fetchSettings();
 
-  const interval = setInterval(() => {
+  const socket = io("http://localhost:5000");
+
+  socket.on("queueUpdated", () => {
     fetchQueue();
     fetchSettings();
-  }, 3000);
+  });
 
-  return () => clearInterval(interval);
+  return () => {
+    socket.disconnect();
+  };
 }, []);
 
   const addPatient = async () => {
@@ -61,8 +66,7 @@ const [queue, setQueue] = useState<Patient[]>([]);
     setName("");
     setPhone("");
 
-    await fetchQueue();
-    await fetchSettings();
+    
   } catch (error) {
     console.error(error);
     alert("Failed to add patient");
@@ -80,8 +84,6 @@ const callNextPatient = async () => {
       "http://localhost:5000/call-next"
     );
 
-    await fetchQueue();
-    await fetchSettings();
   } catch (error) {
     console.log(error);
   }
@@ -100,7 +102,7 @@ const updateAverageTime = async () => {
       }
     );
 
-    await fetchSettings();
+
 
     alert("Average consultation time updated!");
   } catch (error) {
