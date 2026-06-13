@@ -22,7 +22,7 @@ const [queue, setQueue] =
   const fetchQueue = async () => {
   try {
     const response = await axios.get(
-      "http://localhost:5000/queue"
+      "https://queue-cure-production.up.railway.app//queue"
     );
 
     setQueue(response.data);
@@ -34,7 +34,7 @@ const [queue, setQueue] =
 const fetchSettings = async () => {
   try {
     const response = await axios.get(
-      "http://localhost:5000/current-token"
+      "https://queue-cure-production.up.railway.app/current-token"
     );
 
     setCurrentToken(
@@ -53,7 +53,7 @@ useEffect(() => {
   fetchSettings();
   fetchQueue();
 
-  const socket = io("http://localhost:5000");
+  const socket = io("https://queue-cure-production.up.railway.app");
 
   socket.on("queueUpdated", () => {
     fetchSettings();

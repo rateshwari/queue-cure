@@ -23,7 +23,7 @@ const [queue, setQueue] = useState<Patient[]>([]);
   const fetchQueue = async () => {
   try {
     const response = await axios.get(
-      "http://localhost:5000/queue"
+      "https://queue-cure-production.up.railway.app//queue"
     );
 
     setQueue(response.data);
@@ -35,7 +35,7 @@ const [queue, setQueue] = useState<Patient[]>([]);
   fetchQueue();
   fetchSettings();
 
-  const socket = io("http://localhost:5000");
+  const socket = io("https://queue-cure-production.up.railway.app");
 
   socket.on("queueUpdated", () => {
     fetchQueue();
@@ -55,7 +55,7 @@ const [queue, setQueue] = useState<Patient[]>([]);
 }
   try {
     const response = await axios.post(
-      "http://localhost:5000/patients",
+      "https://queue-cure-production.up.railway.app/patients",
       {
         name,
         phone,
@@ -86,7 +86,7 @@ const callNextPatient = async () => {
 
   try {
     await axios.post(
-      "http://localhost:5000/call-next"
+      "https://queue-cure-production.up.railway.app/call-next"
     );
   } catch (error) {
     console.log(error);
@@ -102,7 +102,7 @@ const updateAverageTime = async () => {
 }
   try {
     await axios.put(
-      "http://localhost:5000/average-time",
+      "https://queue-cure-production.up.railway.app/average-time",
       {
         minutes: avgTime,
       }
@@ -120,7 +120,7 @@ const updateAverageTime = async () => {
 const fetchSettings = async () => {
   try {
     const response = await axios.get(
-      "http://localhost:5000/current-token"
+      "https://queue-cure-production.up.railway.app/current-token"
     );
 
     setCurrentToken(response.data.current_token);
