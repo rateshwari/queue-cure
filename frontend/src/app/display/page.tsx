@@ -66,42 +66,72 @@ useEffect(() => {
 }, []);
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center">
-      <h1 className="text-6xl font-bold">
-        NOW SERVING
-      </h1>
+    <main className="h-screen overflow-hidden flex flex-col items-center px-6 py-6">
+      <h1 className="text-5xl font-bold mb-4">
+  QueueCure
+</h1>
 
-      <p className="text-9xl mt-6">
-        {currentToken ?? "--"}
-      </p>
+<p className="text-gray-400 text-xl mb-12">
+  Please wait for your turn
+</p>
 
-      <h2 className="text-3xl mt-10 mb-4">
+<h2 className="text-4xl tracking-widest text-green-400">
+  NOW SERVING
+</h2>
+
+<p className="text-[140px] lg:text-[160px] font-bold leading-none mt-2">
+  {currentToken ?? "--"}
+</p>
+
+      <h2 className="text-2xl font-semibold mt-6 mb-4">
   UP NEXT
 </h2>
 
 {queue.length === 0 ? (
-  <div className="border border-dashed rounded p-6 text-center">
+  <div className="bg-slate-900 border border-slate-800 rounded-2xl px-6 py-4 flex justify-between items-center">
+  <p className="text-5xl mb-4">🎉</p>
+
+  <p className="text-2xl font-semibold">
     No patients waiting
-  </div>
+  </p>
+
+  <p className="text-gray-400 mt-2">
+    The clinic is currently caught up.
+  </p>
+</div>
 ) : (
-  <div className="space-y-4">
-    {queue.slice(0, 5).map((patient, index) => (
-      <div
-        key={patient.id}
-        className="border rounded p-4 w-80 text-center"
-      >
-        <p className="text-2xl font-bold">
+  <div className="w-full max-w-3xl space-y-4">
+
+  {queue.slice(0, 3).map((patient, index) => (
+
+    <div
+      key={patient.id}
+      className="bg-slate-900 border border-slate-800 rounded-2xl px-8 py-6 flex justify-between items-center"
+    >
+      <div>
+        <p className="text-4xl font-bold">
           #{patient.token_number}
         </p>
 
-        <p>{patient.name}</p>
-
-        <p className="text-sm text-gray-500">
-          Estimated Wait: {(index + 1) * averageTime} mins
+        <p className="text-gray-400 mt-1">
+          {index + 1} Patient{index !== 0 ? "s" : ""} Ahead
         </p>
       </div>
-    ))}
-  </div>
+
+      <div className="text-right">
+        <p className="text-3xl font-semibold">
+          {(index + 1) * averageTime} mins
+        </p>
+
+        <p className="text-gray-400">
+          Estimated Wait
+        </p>
+      </div>
+    </div>
+
+  ))}
+
+</div>
 )}
   
 

@@ -180,11 +180,20 @@ app.put("/average-time", async (req, res) => {
   try {
     const { minutes } = req.body;
 
+    const { data: settings, error: settingsError } =
+      await supabase
+        .from("queue_settings")
+        .select("id")
+        .single();
+
+    if (settingsError) throw settingsError;
+
     const { error } = await supabase
       .from("queue_settings")
       .update({
         average_consultation_time: minutes,
-      });
+      })
+      .eq("id", settings.id);
 
     if (error) throw error;
 
@@ -195,6 +204,8 @@ app.put("/average-time", async (req, res) => {
       averageTime: minutes,
     });
   } catch (error) {
+    console.error(error);
+
     res.status(500).json({
       success: false,
       message: error.message,

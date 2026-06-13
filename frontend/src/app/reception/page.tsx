@@ -10,6 +10,7 @@ export default function Home() {
   const [phone, setPhone] = useState("");
   const [token, setToken] = useState<number | null>(null);
   const [avgTime, setAvgTime] = useState(10);
+  const [calling, setCalling] = useState(false);
   interface Patient {
   id: string;
   token_number: number;
@@ -79,13 +80,18 @@ const [queue, setQueue] = useState<Patient[]>([]);
   
 
 const callNextPatient = async () => {
+  if (calling) return;
+
+  setCalling(true);
+
   try {
     await axios.post(
       "http://localhost:5000/call-next"
     );
-
   } catch (error) {
     console.log(error);
+  } finally {
+    setCalling(false);
   }
 };
 
@@ -130,118 +136,262 @@ const fetchSettings = async () => {
 
 
   return (
-    <main className="min-h-screen p-10">
-      <div className="max-w-md mx-auto space-y-4">
-        <div className="border border-gray-700 p-4 rounded mt-6">
+  <main className="min-h-screen bg-slate-950 text-white p-6">
+    <div className="max-w-6xl mx-auto">
 
-        <h1 className="text-3xl font-bold">
-  Reception Dashboard
-</h1>
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold flex items-center gap-2">
+          <span className="h-3 w-3 rounded-full bg-green-500 animate-pulse" />
+          QueueCure
+        </h1>
 
-<p className="text-gray-500">
-  Manage patient queue efficiently
+        <p className="text-gray-500 mt-2">
+          Reception Dashboard
+        </p>
+      </div>
+
+      {/* Top Section */}
+      <div className="grid lg:grid-cols-2 gap-6 items-start">
+
+  {/* LEFT COLUMN */}
+  <div className="space-y-6">
+
+        {/* Add Patient */}
+        <div className="bg-slate-900
+border border-slate-800 rounded-2xl shadow p-6">
+
+          <h2 className="text-2xl font-bold mb-6">
+            Add Patient
+          </h2>
+
+          <input
+            className="border rounded-xl p-3 w-full mb-4"
+            placeholder="Patient Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+
+          <input
+            className="border rounded-xl p-3 w-full mb-4"
+            placeholder="Phone Number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
+
+          <button
+            onClick={addPatient}
+            className="w-full bg-black text-white py-3 rounded-xl font-semibold"
+          >
+            Generate Token
+          </button>
+
+  {token && (
+  <div className="mt-4 bg-green-600 text-white rounded-xl p-4 text-center">
+    <p className="text-sm">
+      Token Generated Successfully
+    </p>
+
+    <p className="text-3xl font-bold mt-1">
+      {token}
+    </p>
+  </div>
+)}
+          
+        </div>
+
+        {/* Average Time */}
+      <div className="bg-[#0B1736] rounded-3xl p-6 mt-8 border border-white/10">
+  <div className="flex items-center justify-between mb-4">
+    <div>
+      <h2 className="text-lg font-semibold text-white">
+        ⚙ Queue Settings
+      </h2>
+
+      <p className="text-xs text-gray-500 mt-2">
+  Current maximum wait: {queue.length * avgTime} mins
+</p>
+    </div>
+  </div>
+
+  <div className="flex gap-3 items-center">
+    <input
+      type="number"
+      value={avgTime}
+      onChange={(e) =>
+        setAvgTime(Number(e.target.value))
+      }
+      className="
+        flex-1
+        bg-[#081229]
+        border
+        border-white/20
+        rounded-xl
+        px-4
+        py-3
+        text-white
+      "
+    />
+
+    <span className="text-gray-400">
+      mins
+    </span>
+
+    <button
+      onClick={updateAverageTime}
+      className="
+        bg-blue-600
+        hover:bg-blue-700
+        px-5
+        py-3
+        rounded-xl
+        font-medium
+        transition
+      "
+    >
+      Update
+    </button>
+  </div>
+</div>
+
+
+</div>
+
+{/* RIGHT COLUMN */}
+<div className="space-y-6">
+
+{/* Now Serving */}
+        <div className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl shadow p-6">
+
+          <p className="uppercase text-sm tracking-widest">
+            Now Serving
+          </p>
+
+          <h2 className="text-7xl font-bold mt-4">
+            {currentToken ?? "--"}
+          </h2>
+
+          <div className="grid grid-cols-3 gap-4 mt-8">
+
+            <div>
+              <p className="text-sm opacity-80">
+                Queue
+              </p>
+
+              <p className="text-2xl font-bold">
+                {queue.length}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-sm opacity-80">
+                Patients Served
+              </p>
+
+              <p className="text-2xl font-bold">
+  {currentToken ? currentToken - 100 : 0}
+</p>
+            </div>
+
+            <div>
+              <p className="text-sm opacity-80">
+                Max Wait
+              </p>
+
+              <p className="text-2xl font-bold">
+                {queue.length * avgTime}m
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+
+        {/* Queue */}
+      <div className="bg-slate-900
+border border-slate-800 rounded-2xl shadow p-6 mt-6">
+
+        <h2 className="text-2xl font-bold mb-6">
+          Current Queue
+        </h2>
+
+        {queue.length === 0 ? (
+
+          <div className="text-center py-10">
+  <div className="text-5xl mb-3">
+    🎉
+  </div>
+
+  <p className="text-lg font-medium">
+    No patients waiting
+  </p>
+
+  <p className="text-gray-400">
+    Queue is currently empty
+  </p>
+</div>
+
+        ) : (
+
+          <div className="space-y-3">
+
+            {queue.map((patient, index) => (
+
+              <div
+  key={patient.id}
+  className="flex justify-between items-center bg-slate-950 border border-white/20 rounded-2xl p-5"
+>
+                <div>
+  <p className="text-2xl font-bold">
+    #{patient.token_number}
+  </p>
+
+  <p className="text-gray-400 mt-1">
+    {patient.name}
+  </p>
+</div>
+
+                <div className="text-right flex items-center gap-3">
+
+  <p className="font-semibold text-lg">
+  Wait: {(index + 1) * avgTime} mins
 </p>
 
-        <input
-          className="border p-3 w-full"
-          placeholder="Patient Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+  {index === 0 && (
+    <button
+  onClick={callNextPatient}
+  disabled={calling}
+  className={`px-5 py-2 rounded-xl font-semibold transition ${
+    calling
+      ? "bg-gray-500 cursor-not-allowed"
+      : "bg-green-600 hover:bg-green-700"
+  }`}
+>
+  {calling
+  ? "Calling..."
+  : `Call #${patient.token_number}`}
+</button>
+  )}
 
-        <input
-          className="border p-3 w-full"
-          placeholder="Phone Number"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
+</div>
+              </div>
 
-        <button
-          onClick={addPatient}
-          className="bg-black text-white px-4 py-3 rounded w-full"
-        >
-          Generate Token
-        </button>
+            ))}
 
-        {token && (
-          <div className="p-4 border rounded">
-            Generated Token: {token}
           </div>
+
         )}
       </div>
 
 
-      <div className="border border-gray-700 p-4 rounded mt-6">
-  <h2 className="text-xl font-bold">
-    Current Token
-  </h2>
 
-  <p className="text-3xl mt-2">
-    {currentToken ?? "None"}
-  </p>
-</div>
+      </div>
 
-
-
-<button
-  onClick={callNextPatient}
-  className="bg-green-600 text-white px-4 py-3 rounded mt-4 w-full"
->
-  Call Next Patient
-</button>
       
-  <h2 className="text-xl font-bold mb-3">
-    Current Queue
-  </h2>
 
-  {queue.length === 0 ? (
-    <div className="border border-dashed border-gray-500 rounded p-4 text-center">
-  No patients waiting
-</div>
-  ) : (
-    <div className="border border-gray-700 rounded">
-  {queue.map((patient) => (
-    <div
-      key={patient.id}
-      className="p-3 border-b border-gray-700"
-    >
-      <span className="font-semibold">
-        #{patient.token_number}
-      </span>
-      {" - "}
-      {patient.name}
+      </div>
+
+      
     </div>
-  ))}
-</div>
-  )}
-
-  <div className="border border-gray-700 p-4 rounded mt-6">
-  <h2 className="text-xl font-bold mb-2">
-    Average Consultation Time (mins)
-  </h2>
-
-  <input
-    type="number"
-    value={avgTime}
-    onChange={(e) =>
-      setAvgTime(Number(e.target.value))
-    }
-    className="border p-3 w-full"
-  />
-
-  <button
-    onClick={updateAverageTime}
-    className="bg-blue-600 text-white px-4 py-3 rounded mt-3 w-full"
-  >
-    Save Average Time
-  </button>
-</div>
-
-</div>
-
-
-
-
-    </main>
-  );
-}
+  </main>
+)}
