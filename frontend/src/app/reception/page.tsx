@@ -23,7 +23,7 @@ const [queue, setQueue] = useState<Patient[]>([]);
   const fetchQueue = async () => {
   try {
     const response = await axios.get(
-      "https://queue-cure-production.up.railway.app//queue"
+      "https://queue-cure-production.up.railway.app/queue"
     );
 
     setQueue(response.data);
