@@ -162,6 +162,43 @@ await supabase
   }
 });
 
+app.post("/complete-consultation", async (req, res) => {
+  try {
+    const { data: patient, error } = await supabase
+      .from("patients")
+      .select("*")
+      .eq("status", "in_consultation")
+      .limit(1)
+      .single();
+
+    if (error || !patient) {
+      return res.json({
+        success: false,
+        message: "No active consultation",
+      });
+    }
+
+    const { error: updateError } = await supabase
+      .from("patients")
+      .update({
+        status: "completed",
+      })
+      .eq("id", patient.id);
+
+    if (updateError) throw updateError;
+
+    io.emit("queueUpdated");
+
+    res.json({
+      success: true,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+});
+
 app.get("/current-token", async (req, res) => {
   try {
     const { data, error } = await supabase
