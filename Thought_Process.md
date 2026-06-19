@@ -168,6 +168,29 @@ The receptionist interface prioritizes:
 
 ---
 
+# Tradeoffs Considered
+
+Several design tradeoffs were considered during development.
+
+### Manual Consultation Time vs Automatic Learning
+
+The system currently allows the receptionist to configure average consultation time manually.
+
+While automatic learning from historical consultations would improve prediction accuracy, manual configuration was chosen to keep the solution simple, reliable, and easy to deploy in small neighborhood clinics.
+
+### Two-Screen Architecture
+
+A separate patient display was chosen instead of showing all information on the receptionist screen.
+
+This reduces crowding at the reception desk and allows patients to independently track queue progress.
+
+### Real-Time Synchronization vs Polling
+
+Socket.IO was selected instead of periodic API polling because it provides immediate updates and reduces unnecessary network requests.
+
+---
+
+
 # Future Improvements
 
 * Automatic consultation time learning.
