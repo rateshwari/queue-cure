@@ -348,10 +348,35 @@ Patient Display:
 https://queue-cure-six.vercel.app/display
 
 GitHub Repository:
-
 https://github.com/rateshwari/queue-cure
 
+### Demo Scenario
+
+1. Receptionist adds a patient.
+2. Token is generated instantly.
+3. Receptionist clicks "Call Next".
+4. Patient display updates immediately.
+5. Wait times recalculate automatically.
+6. Consultation is completed.
+7. Queue updates without refreshing either screen.
+
+
 ---
+
+# ⚠️ Edge Cases Handled
+
+- No patients waiting.
+- No active consultation.
+- Duplicate "Call Next" prevention.
+- Empty queue handling.
+- Input validation.
+- Live synchronization after state changes.
+- Queue display fallback states.
+
+Queue Cure ensures that both screens always remain consistent, even during rapid queue updates.
+
+---
+
 
 # 🔮 Beyond the Hackathon
 
