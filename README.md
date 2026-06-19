@@ -42,7 +42,7 @@ Queue Cure transforms traditional waiting rooms into transparent, real-time expe
 
 Designed for fast-paced clinic workflows.
 
-![Reception Dashboard](screenshots/reception-dashboard.png)
+![Reception Dashboard](screenshots/ss-reception-dashboard.png)
 
 Features:
 - Add new patients
@@ -58,7 +58,7 @@ Features:
 
 Designed to be viewed from across the room.
 
-![Patient Display](screenshots/patient-display.png)
+![Patient Display](screenshots/ss-patient-display.png)
 
 Features:
 - Displays current token being served
