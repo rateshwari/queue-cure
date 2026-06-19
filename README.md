@@ -255,6 +255,19 @@ No hardcoded wait values.
 
 ---
 
+# 🚀 Deployment
+
+| Component | Platform |
+|----------|----------|
+| Frontend | Vercel |
+| Backend | Railway |
+| Database | Supabase |
+
+Queue Cure is fully deployed and accessible through public URLs.
+
+---
+
+
 # 📂 Project Structure
 
 ```text
