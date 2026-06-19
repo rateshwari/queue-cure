@@ -319,11 +319,13 @@ SUPABASE_KEY=your_supabase_key
 
 ---
 
-# 🎥 Demo
+# 🌐 Live Demo
 
-Demo Video:
+Reception Dashboard:
+https://queue-cure-six.vercel.app/reception
 
-> To be added after recording the submission demo.
+Patient Display:
+https://queue-cure-six.vercel.app/display
 
 GitHub Repository:
 
