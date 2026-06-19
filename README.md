@@ -134,11 +134,9 @@ To reduce errors, Queue Cure includes:
 
 ## Dynamic Wait Estimation
 
-No hardcoded values are used.
-
 Estimated wait times are calculated using:
 
-```
+```text
 Estimated Wait
 =
 Position in Queue
@@ -146,8 +144,9 @@ Position in Queue
 Average Consultation Time
 ```
 
-Whenever consultation settings change, wait times update instantly across both screens.
+The receptionist can configure the clinic's average consultation duration, and estimated waiting times update instantly across both screens.
 
+This avoids hardcoded values and allows clinics to adapt the system to their own workflows.
 ---
 
 # 🔄 Real-Time Synchronization
