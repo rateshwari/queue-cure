@@ -12,6 +12,10 @@ app.use(cors({
   origin: "*"
 }));
 app.use(express.json());
+app.get("/test", (req, res) => {
+  console.log("TEST ROUTE HIT");
+  res.send("OK");
+});
 
 app.get("/", (req, res) => {
   res.send("Queue Cure API Running");
@@ -104,6 +108,19 @@ app.get("/queue", async (req, res) => {
 });
 
 app.post("/call-next", async (req, res) => {
+
+  const { data: activePatient } = await supabase
+  .from("patients")
+  .select("*")
+  .eq("status", "in_consultation")
+  .limit(1);
+
+if (activePatient && activePatient.length > 0) {
+  return res.json({
+    success: false,
+    message: "Finish current consultation first",
+  });
+}
   try {
     // Get first waiting patient
     const { data: patients, error } = await supabase
@@ -162,7 +179,10 @@ await supabase
   }
 });
 
+
 app.post("/complete-consultation", async (req, res) => {
+  console.log("COMPLETE CONSULTATION CALLED");
+
   try {
     const { data: patient, error } = await supabase
       .from("patients")
@@ -187,17 +207,38 @@ app.post("/complete-consultation", async (req, res) => {
 
     if (updateError) throw updateError;
 
+    const { data: settings } = await supabase
+      .from("queue_settings")
+      .select("id")
+      .single();
+
+    console.log("SETTINGS:", settings);
+
+    const result = await supabase
+      .from("queue_settings")
+      .update({
+        current_token: null,
+      })
+      .eq("id", settings.id)
+      .select();
+
+    console.log("UPDATE RESULT:", result);
+
     io.emit("queueUpdated");
 
     res.json({
       success: true,
     });
+
   } catch (error) {
+    console.log("ERROR:", error);
+
     res.status(500).json({
       message: error.message,
     });
   }
 });
+
 
 app.get("/current-token", async (req, res) => {
   try {

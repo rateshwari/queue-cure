@@ -19,11 +19,37 @@ export default function Home() {
   status: string;
 }
 
+const [patients, setPatients] = useState<Patient[]>([]);
+
 const [queue, setQueue] = useState<Patient[]>([]);
+const inConsultation = patients.filter(
+  p => p.status === "in_consultation"
+).length;
+
+const completed = patients.filter(
+  p => p.status === "completed"
+).length;
+
+const currentPatient = patients.find(
+  (p) => p.status === "in_consultation"
+) || null;
+
+const completeConsultation = async () => {
+  console.log("BUTTON CLICKED");
+
+  try {
+    await axios.post(
+      "http://localhost:5000/complete-consultation"
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
+
   const fetchQueue = async () => {
   try {
     const response = await axios.get(
-      "https://queue-cure-production.up.railway.app/queue"
+      "http://localhost:5000/queue"
     );
 
     setQueue(response.data);
@@ -34,12 +60,14 @@ const [queue, setQueue] = useState<Patient[]>([]);
   useEffect(() => {
   fetchQueue();
   fetchSettings();
+  fetchAnalytics();
 
-  const socket = io("https://queue-cure-production.up.railway.app");
+  const socket = io("http://localhost:5000");
 
   socket.on("queueUpdated", () => {
     fetchQueue();
     fetchSettings();
+    fetchAnalytics();
   });
 
   return () => {
@@ -55,7 +83,7 @@ const [queue, setQueue] = useState<Patient[]>([]);
 }
   try {
     const response = await axios.post(
-      "https://queue-cure-production.up.railway.app/patients",
+      "http://localhost:5000/patients",
       {
         name,
         phone,
@@ -74,9 +102,6 @@ const [queue, setQueue] = useState<Patient[]>([]);
   }
 };
 
-  const [currentToken, setCurrentToken] =
-  useState<number | null>(null);
-
   
 
 const callNextPatient = async () => {
@@ -86,7 +111,7 @@ const callNextPatient = async () => {
 
   try {
     await axios.post(
-      "https://queue-cure-production.up.railway.app/call-next"
+      "http://localhost:5000/call-next"
     );
   } catch (error) {
     console.log(error);
@@ -102,7 +127,7 @@ const updateAverageTime = async () => {
 }
   try {
     await axios.put(
-      "https://queue-cure-production.up.railway.app/average-time",
+      "http://localhost:5000/average-time",
       {
         minutes: avgTime,
       }
@@ -120,10 +145,10 @@ const updateAverageTime = async () => {
 const fetchSettings = async () => {
   try {
     const response = await axios.get(
-      "https://queue-cure-production.up.railway.app/current-token"
+      "http://localhost:5000/current-token"
     );
 
-    setCurrentToken(response.data.current_token);
+
 
     setAvgTime(
       response.data.average_consultation_time
@@ -133,47 +158,69 @@ const fetchSettings = async () => {
   }
 };
 
+const fetchAnalytics = async () => {
+  try {
+    const response = await axios.get(
+      "http://localhost:5000/patients"
+    );
+
+    const allPatients = response.data;
+
+    console.log(
+      "Count:",
+      allPatients.filter(
+        (p: Patient) => p.status === "in_consultation"
+      ).length
+    );
+
+    setPatients(allPatients);
+
+    
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 
 
   return (
-  <main className="min-h-screen bg-slate-950 text-white p-6">
+  <main className="h-screen overflow-hidden bg-slate-50 text-slate-900 p-4">
     <div className="max-w-6xl mx-auto">
 
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-4">
         <h1 className="text-4xl font-bold flex items-center gap-2">
           <span className="h-3 w-3 rounded-full bg-green-500 animate-pulse" />
           QueueCure
         </h1>
 
-        <p className="text-gray-500 mt-2">
+        <p className="text-slate-500 mt-2">
           Reception Dashboard
         </p>
       </div>
 
       {/* Top Section */}
-      <div className="grid lg:grid-cols-2 gap-6 items-start">
+      <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-4 items-start">
 
   {/* LEFT COLUMN */}
-  <div className="space-y-6">
+  <div className="space-y-4">
 
         {/* Add Patient */}
-        <div className="bg-slate-900
-border border-slate-800 rounded-2xl shadow p-6">
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-4">
 
-          <h2 className="text-2xl font-bold mb-6">
+          <h2 className="text-2xl font-bold text-slate-900 mb-4">
             Add Patient
           </h2>
 
           <input
-            className="border rounded-xl p-3 w-full mb-4"
+            className="border border-slate-300 rounded-xl p-3 w-full mb-4 bg-white text-slate-900"
             placeholder="Patient Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
 
           <input
-            className="border rounded-xl p-3 w-full mb-4"
+            className="border border-slate-300 rounded-xl p-3 w-full mb-4 bg-white text-slate-900"
             placeholder="Phone Number"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
@@ -192,7 +239,7 @@ border border-slate-800 rounded-2xl shadow p-6">
       Token Generated Successfully
     </p>
 
-    <p className="text-3xl font-bold mt-1">
+    <p className="text-3xl font-bold text-slate-900 mt-1">
       {token}
     </p>
   </div>
@@ -201,14 +248,14 @@ border border-slate-800 rounded-2xl shadow p-6">
         </div>
 
         {/* Average Time */}
-      <div className="bg-[#0B1736] rounded-3xl p-6 mt-8 border border-white/10">
+      <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
   <div className="flex items-center justify-between mb-4">
     <div>
-      <h2 className="text-lg font-semibold text-white">
+      <h2 className="text-lg font-semibold text-slate-900">
         ⚙ Queue Settings
       </h2>
 
-      <p className="text-xs text-gray-500 mt-2">
+      <p className="flex gap-3 items-center">
   Current maximum wait: {queue.length * avgTime} mins
 </p>
     </div>
@@ -222,18 +269,20 @@ border border-slate-800 rounded-2xl shadow p-6">
         setAvgTime(Number(e.target.value))
       }
       className="
-        flex-1
-        bg-[#081229]
-        border
-        border-white/20
-        rounded-xl
-        px-4
-        py-3
-        text-white
-      "
+flex-1
+bg-[url('/hospital-bg.jpg')]
+bg-cover
+bg-center
+border
+border-slate-300
+rounded-xl
+px-4
+py-3
+text-slate-900
+"
     />
 
-    <span className="text-gray-400">
+    <span className="text-slate-500">
       mins
     </span>
 
@@ -255,41 +304,43 @@ border border-slate-800 rounded-2xl shadow p-6">
 </div>
 
 
+
+
 </div>
 
 {/* RIGHT COLUMN */}
-<div className="space-y-6">
+<div className="space-y-4">
 
 {/* Now Serving */}
-        <div className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl shadow p-6">
+        <div className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl shadow p-4">
 
           <p className="uppercase text-sm tracking-widest">
             Now Serving
           </p>
 
-          <h2 className="text-7xl font-bold mt-4">
-            {currentToken ?? "--"}
-          </h2>
+          <h2 className="text-5xl font-bold mt-2">
+  {currentPatient?.token_number ?? "--"}
+</h2>
 
-          <div className="grid grid-cols-3 gap-4 mt-8">
+          <div className="grid grid-cols-3 gap-4 mt-4">
 
             <div>
               <p className="text-sm opacity-80">
                 Queue
               </p>
 
-              <p className="text-2xl font-bold">
+              <p className="text-2xl font-bold text-slate-900">
                 {queue.length}
               </p>
             </div>
 
             <div>
               <p className="text-sm opacity-80">
-                Patients Served
+                Completed
               </p>
 
-              <p className="text-2xl font-bold">
-  {currentToken ? currentToken - 100 : 0}
+              <p className="text-2xl font-bold text-slate-900">
+  {completed}
 </p>
             </div>
 
@@ -298,40 +349,65 @@ border border-slate-800 rounded-2xl shadow p-6">
                 Max Wait
               </p>
 
-              <p className="text-2xl font-bold">
+              <p className="text-2xl font-bold text-slate-900">
                 {queue.length * avgTime}m
               </p>
             </div>
 
           </div>
         </div>
+        <button
+  onClick={completeConsultation}
+  disabled={!currentPatient}
+  className={`w-full py-3 rounded-2xl font-bold mt-4 ${
+    currentPatient
+      ? "bg-blue-600 hover:bg-blue-700 text-white"
+      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+  }`}
+>
+  {currentPatient
+    ? "Complete Current Consultation"
+    : "No Active Consultation"}
+</button>
+
+
+
+
+
 
 
         {/* Queue */}
-      <div className="bg-slate-900
-border border-slate-800 rounded-2xl shadow p-6 mt-6">
+      <div className="
+bg-white
+border
+border-slate-200
+shadow-sm
+rounded-2xl
+p-4
+h-[260px]
+overflow-y-auto
+">
 
-        <h2 className="text-2xl font-bold mb-6">
+        <h2 className="text-2xl font-bold mb-4">
           Current Queue
         </h2>
 
         {queue.length === 0 ? (
 
-          <div className="text-center py-10">
-  <div className="text-5xl mb-3">
-    🎉
-  </div>
+  <div className="text-center py-6">
+  <div className="text-4xl mb-2">✅</div>
 
-  <p className="text-lg font-medium">
-    No patients waiting
-  </p>
+  <h3 className="text-lg font-semibold">
+    Queue Clear
+  </h3>
 
-  <p className="text-gray-400">
-    Queue is currently empty
+  <p className="text-slate-500 text-sm mt-1">
+    All patients attended
   </p>
 </div>
 
-        ) : (
+
+) : (
 
           <div className="space-y-3">
 
@@ -339,15 +415,15 @@ border border-slate-800 rounded-2xl shadow p-6 mt-6">
 
               <div
   key={patient.id}
-  className="flex justify-between items-center bg-slate-950 border border-white/20 rounded-2xl p-5"
+  className="flex justify-between items-center bg-slate-50 border border-slate-200 rounded-2xl p-5"
 >
                 <div>
   <p className="text-2xl font-bold">
     #{patient.token_number}
   </p>
 
-  <p className="text-gray-400 mt-1">
-    {patient.name}
+  <p className="text-slate-500 mt-1">
+  Waiting Patient
   </p>
 </div>
 

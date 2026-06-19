@@ -22,7 +22,7 @@ const [queue, setQueue] =
   const fetchQueue = async () => {
   try {
     const response = await axios.get(
-      "https://queue-cure-production.up.railway.app/queue"
+      "http://localhost:5000/queue"
     );
 
     setQueue(response.data);
@@ -34,8 +34,10 @@ const [queue, setQueue] =
 const fetchSettings = async () => {
   try {
     const response = await axios.get(
-      "https://queue-cure-production.up.railway.app/current-token"
+      "http://localhost:5000/current-token"
     );
+
+    console.log("SETTINGS:", response.data);
 
     setCurrentToken(
       response.data.current_token
@@ -53,7 +55,7 @@ useEffect(() => {
   fetchSettings();
   fetchQueue();
 
-  const socket = io("https://queue-cure-production.up.railway.app");
+  const socket = io("http://localhost:5000");
 
   socket.on("queueUpdated", () => {
     fetchSettings();
@@ -66,75 +68,76 @@ useEffect(() => {
 }, []);
 
   return (
-    <main className="h-screen overflow-hidden flex flex-col items-center px-6 py-6">
-      <h1 className="text-5xl font-bold mb-4">
-  QueueCure
-</h1>
+  <main className="h-screen bg-[#0a0f1e] text-slate-100 overflow-hidden flex flex-col items-center px-6 py-6">
+    <h1 className="text-5xl font-bold mb-4">
+      QueueCure
+    </h1>
 
-<p className="text-gray-400 text-xl mb-12">
-  Please wait for your turn
-</p>
+    <p className="text-slate-400 text-lg mb-10">
+      Please wait for your turn
+    </p>
 
-<h2 className="text-4xl tracking-widest text-green-400">
-  NOW SERVING
-</h2>
-
-<p className="text-[140px] lg:text-[160px] font-bold leading-none mt-2">
-  {currentToken ?? "--"}
-</p>
-
-      <h2 className="text-2xl font-semibold mt-6 mb-4">
-  UP NEXT
-</h2>
-
-{queue.length === 0 ? (
-  <div className="bg-slate-900 border border-slate-800 rounded-2xl px-6 py-4 flex justify-between items-center">
-  <p className="text-5xl mb-4">🎉</p>
-
-  <p className="text-2xl font-semibold">
-    No patients waiting
-  </p>
-
-  <p className="text-gray-400 mt-2">
-    The clinic is currently caught up.
-  </p>
-</div>
-) : (
-  <div className="w-full max-w-3xl space-y-4">
-
-  {queue.slice(0, 3).map((patient, index) => (
-
-    <div
-      key={patient.id}
-      className="bg-slate-900 border border-slate-800 rounded-2xl px-8 py-6 flex justify-between items-center"
-    >
-      <div>
-        <p className="text-4xl font-bold">
-          #{patient.token_number}
-        </p>
-
-        <p className="text-gray-400 mt-1">
-          {index + 1} Patient{index !== 0 ? "s" : ""} Ahead
-        </p>
-      </div>
-
-      <div className="text-right">
-        <p className="text-3xl font-semibold">
-          {(index + 1) * averageTime} mins
-        </p>
-
-        <p className="text-gray-400">
-          Estimated Wait
-        </p>
-      </div>
+    <div className="flex items-center gap-3">
+      <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+      <h2 className="text-3xl font-medium text-green-500">
+        Now Serving
+      </h2>
     </div>
 
-  ))}
+    <div className="h-[220px] flex items-center justify-center">
+      {currentToken ? (
+        <p className="text-[220px] lg:text-[260px] font-bold leading-none">
+          {currentToken}
+        </p>
+      ) : (
+        <div className="text-center">
+          <p className="text-7xl font-bold text-slate-600">
+            --
+          </p>
+          <p className="text-slate-500 mt-3">
+            No active consultation
+          </p>
+        </div>
+      )}
+    </div>
 
-</div>
-)}
-  
+    <h2 className="text-2xl font-semibold mt-6 mb-4">
+      UP NEXT
+    </h2>
 
-    </main>
-  );
+    {queue.length === 0 ? (
+      <div className="bg-[#1e293b] border border-[#2d3f55] rounded-2xl w-full max-w-xl px-12 py-10 text-center">
+        <div className="text-5xl mb-3">✅</div>
+        <p className="text-2xl font-semibold">Queue Clear</p>
+        <p className="text-slate-500 mt-2">No patients waiting</p>
+      </div>
+    ) : (
+      <div className="w-full max-w-3xl space-y-4">
+        {queue.slice(0, 3).map((patient, index) => (
+          <div
+            key={patient.id}
+            className="bg-[#1e293b] border border-[#2d3f55] rounded-2xl px-8 py-6 flex justify-between items-center"
+          >
+            <div>
+              <p className="text-4xl font-bold">
+                #{patient.token_number}
+              </p>
+              <p className="text-slate-500 mt-1">
+                Token #{patient.token_number}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-3xl font-semibold text-amber-400">
+                {(index + 1) * averageTime} mins
+              </p>
+              <p className="text-slate-500">
+                Estimated Wait
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </main>
+);
 }
