@@ -190,6 +190,22 @@ Socket.IO was selected instead of periodic API polling because it provides immed
 
 ---
 
+# Scalability Considerations
+
+Queue Cure was designed as a modular system.
+
+Future deployments could support:
+
+* Multiple doctors.
+* Multiple consultation rooms.
+* Multiple clinics.
+* Centralized dashboards.
+* Cloud-hosted deployments.
+
+The current architecture using Express, Supabase, and Socket.IO allows the system to scale without major architectural changes.
+
+---
+
 
 # Future Improvements
 
@@ -204,4 +220,9 @@ Socket.IO was selected instead of periodic API polling because it provides immed
 
 # Key Takeaway
 
-Queue Cure demonstrates how a simple real-time system can reduce uncertainty for patients, simplify reception workflows, and improve clinic operations without requiring expensive infrastructure.
+Queue Cure demonstrates that improving patient experience does not always require expensive infrastructure or complex healthcare systems.
+
+By combining real-time synchronization, transparent queue visibility, and a simple receptionist workflow, the system reduces uncertainty for patients while improving operational efficiency for clinics.
+
+The project highlights how thoughtfully designed technology can solve everyday healthcare problems at a neighborhood scale.
+
