@@ -395,7 +395,8 @@ Queue Cure could evolve into a comprehensive clinic operations platform featurin
 
 **Rateshwari Shakthivel**
 
-Built as part of **Queue Cure '26** to explore how simple, thoughtfully designed technology can improve patient experiences and streamline healthcare workflows.
+Built to bring real-time queue visibility to India's 1.5 million 
+neighbourhood clinics — starting with the receptionist's desk.
 
 ---
 
