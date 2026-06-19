@@ -254,20 +254,15 @@ No hardcoded wait values.
 queue-cure/
 │
 ├── frontend/
-│   ├── receptionist/
-│   └── display/
-│
 ├── backend/
-│
 ├── screenshots/
-│   ├── reception-dashboard.png
-│   └── patient-display.png
+│   ├── ss-reception-dashboard.png
+│   └── ss-patient-display.png
 │
 ├── README.md
 ├── Thought_Process.md
 └── socket-event-diagram.png
 ```
-
 ---
 
 # 🚀 Getting Started
