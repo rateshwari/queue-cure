@@ -188,6 +188,13 @@ No manual refresh is required.
 
 ---
 
+# 🔌 Socket Event Diagram
+
+![Socket Event Diagram](socket-event-diagram.png)
+
+---
+
+
 # ✅ Built Against the Hackathon Evaluation Criteria
 
 ## Live Queue Updates (40%)
