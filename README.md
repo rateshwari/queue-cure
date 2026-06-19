@@ -80,6 +80,14 @@ By reducing uncertainty for patients and simplifying queue management for recept
 
 ---
 
+# 💡 The Moment That Matters
+
+"When the receptionist clicks 'Call Next' and every patient screen in the clinic updates instantly without anyone refreshing the page."
+
+This is the moment that demonstrates Queue Cure's value to a clinic owner.
+
+---
+
 # ⚙️ The Engineering Challenge
 
 The challenge wasn't building forms.
