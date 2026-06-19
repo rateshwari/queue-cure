@@ -95,7 +95,7 @@ The challenge wasn't building forms.
 The real challenge was ensuring that:
 
 - Two independent screens remained synchronized in real time.
-- Wait times were calculated dynamically from actual queue data.
+- Wait times were calculated dynamically using patient position in the queue and configurable consultation duration.
 - Receptionists couldn't accidentally trigger duplicate actions.
 - Patients always saw the latest queue state without refreshing.
 - The display screen remained usable as a passive TV interface.
